@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+  <view class="content" wx:else>
+    <!-- 客户信息 -->
+    <view class="info-card" wx:if="{{customer}}">
+      <view class="info-row">
+        <text class="info-label">客户姓名</text>
+        <text class="info-value">{{customer.customerName}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">收车金额</text>
+        <text class="info-value price">{{customer.collectionAmount}}</text>
+      </view>
+    </view>
+
+    <!-- 凭证上传 -->
+    <view class="upload-section">
+      <view class="section-title">放款凭证</view>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{vouchers}}" wx:key="index">
+          <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
+          <view class="delete-btn" data-index="{{index}}" catchtap="deleteImage">×</view>
+        </view>
+        <view class="add-image" bindtap="chooseImage" wx:if="{{vouchers.length < 9}}">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加凭证</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 保存按钮 -->
+    <view class="bottom-btn">
+      <button class="save-btn" bindtap="saveVoucher">保存凭证</button>
+    </view>
+  </view>
+</view>

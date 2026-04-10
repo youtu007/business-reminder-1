@@ -1,0 +1,242 @@
+<view class="page">
+  <view class="loading-mask" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view class="form" wx:else>
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="section-title">基本信息</view>
+
+      <view class="field">
+        <text class="label required">客户姓名</text>
+        <input class="input" placeholder="客户姓名" value="{{form.customerName}}" data-field="customerName" bindinput="onInput" />
+        <view class="ocr-btn" bindtap="recognizeIdCardOCR">身份证识别</view>
+      </view>
+
+      <view class="field">
+        <text class="label required">身份证</text>
+        <input class="input" placeholder="身份证号" value="{{form.idCard}}" data-field="idCard" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label">车牌号</text>
+        <input class="input" placeholder="请输入" value="{{form.licensePlate}}" data-field="licensePlate" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label required">车架号</text>
+        <input class="input" placeholder="请输入" value="{{form.frameNumber}}" data-field="frameNumber" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label required">车品牌</text>
+        <input class="input" placeholder="请输入" value="{{form.carBrand}}" data-field="carBrand" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label required">客户地址</text>
+        <input class="input" placeholder="请输入" value="{{form.customerAddress}}" data-field="customerAddress" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label">客户电话</text>
+        <input class="input" type="number" placeholder="请输入" value="{{form.customerPhone}}" data-field="customerPhone" bindinput="onInput" />
+      </view>
+    </view>
+
+    <!-- 业务信息 -->
+    <view class="section">
+      <view class="section-title">业务信息</view>
+
+      <view class="field">
+        <text class="label required">业务员</text>
+        <picker class="picker-wrapper" mode="selector" range="{{salesmenNames}}" value="{{salesmanIndex}}" bindchange="onSalesmanChange">
+          <view class="picker">
+            <text class="{{salesmanIndex == 0 ? 'placeholder' : ''}}">{{salesmenNames[salesmanIndex] || '业务员'}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field" wx:if="{{salesmanIndex > 0 && salesmen[salesmanIndex - 1].phone}}">
+        <text class="label">业务员电话</text>
+        <text class="value">{{salesmen[salesmanIndex - 1].phone}}</text>
+      </view>
+
+      <view class="field">
+        <text class="label required">档案收取员</text>
+        <picker class="picker-wrapper" mode="selector" range="{{salesmenNames}}" value="{{archiveReceiverIndex}}" bindchange="onArchiveReceiverChange">
+          <view class="picker">
+            <text class="{{archiveReceiverIndex == 0 ? 'placeholder' : ''}}">{{salesmenNames[archiveReceiverIndex] || '档案资料收取员'}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label required">客户来源</text>
+        <picker class="picker-wrapper" mode="selector" range="{{sourceOptions}}" value="{{sourceIndex}}" bindchange="onSourceChange">
+          <view class="picker">
+            <text class="{{sourceIndex == 0 ? 'placeholder' : ''}}">{{sourceOptions[sourceIndex]}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- 渠道备注：仅当选择"渠道"时显示 -->
+      <view class="field" wx:if="{{sourceIndex > 0 && customerSources[sourceIndex - 1] == '渠道'}}">
+        <text class="label">渠道备注</text>
+        <input class="input" placeholder="请输入渠道详细信息" value="{{form.channelName}}" data-field="channelName" bindinput="onInput" />
+      </view>
+
+      <view class="field" wx:if="{{sourceIndex > 0 && customerSources[sourceIndex - 1] == '渠道'}}">
+        <text class="label">渠道电话</text>
+        <input class="input" type="number" placeholder="请输入" value="{{form.channelPhone}}" data-field="channelPhone" bindinput="onInput" />
+      </view>
+    </view>
+
+    <!-- 银行信息 -->
+    <view class="section">
+      <view class="section-title">银行信息</view>
+
+      <view class="field">
+        <text class="label required">开户行</text>
+        <picker class="picker-wrapper" mode="selector" range="{{bankOptions}}" value="{{bankIndex}}" bindchange="onBankChange">
+          <view class="picker">
+            <text class="{{bankIndex == 0 ? 'placeholder' : ''}}">{{bankOptions[bankIndex]}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label required">银行卡号</text>
+        <input class="input" type="number" placeholder="银行卡号" value="{{form.bankCardNumber}}" data-field="bankCardNumber" bindinput="onInput" />
+        <view class="ocr-btn" bindtap="recognizeBankCardOCR">卡号识别</view>
+      </view>
+    </view>
+
+    <!-- 车辆信息 -->
+    <view class="section">
+      <view class="section-title">车辆信息</view>
+
+      <view class="field">
+        <text class="label required">评估金额(万元)</text>
+        <input class="input" type="digit" placeholder="请输入" value="{{form.assessmentAmount}}" data-field="assessmentAmount" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label required">是否按揭</text>
+        <picker class="picker-wrapper" mode="selector" range="{{isMortgageOptions}}" value="{{isMortgageIndex}}" bindchange="onIsMortgageChange">
+          <view class="picker">
+            <text>{{isMortgageOptions[isMortgageIndex]}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label required">收车金额</text>
+        <input class="input" type="digit" placeholder="请输入" value="{{form.collectionAmount}}" data-field="collectionAmount" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label required">收车方案</text>
+        <picker class="picker-wrapper" mode="selector" range="{{planOptions}}" value="{{planIndex}}" bindchange="onPlanChange">
+          <view class="picker">
+            <text class="{{planIndex == 0 ? 'placeholder' : ''}}">{{planOptions[planIndex]}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label">试算</text>
+        <input class="input" placeholder="自动计算" value="{{form.trialCalculation}}" disabled="{{true}}" />
+      </view>
+
+      <view class="field">
+        <text class="label">每期应还金额</text>
+        <input class="input" placeholder="自动计算" value="{{form.monthlyRepayment}}" disabled="{{true}}" />
+      </view>
+
+      <view class="field">
+        <text class="label required">是否收车</text>
+        <picker class="picker-wrapper" mode="selector" range="{{isCollectedOptions}}" value="{{isCollectedIndex}}" bindchange="onIsCollectedChange">
+          <view class="picker">
+            <text>{{isCollectedOptions[isCollectedIndex]}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label required">收车人</text>
+        <input class="input" placeholder="请输入" value="{{form.collector}}" data-field="collector" bindinput="onInput" />
+      </view>
+
+      <view class="field">
+        <text class="label">申请时间</text>
+        <picker class="picker-wrapper" mode="date" value="{{form.applicationTime}}" bindchange="onApplicationTimeChange">
+          <view class="picker">
+            <text class="{{form.applicationTime ? '' : 'placeholder'}}">{{form.applicationTime || '请选择'}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="field">
+        <text class="label">预计销售时间</text>
+        <picker class="picker-wrapper" mode="date" value="{{form.expectedSaleTime}}" bindchange="onExpectedSaleTimeChange">
+          <view class="picker">
+            <text class="{{form.expectedSaleTime ? '' : 'placeholder'}}">{{form.expectedSaleTime || '请选择'}}</text>
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 影像资料补充 -->
+    <view class="section">
+      <view class="section-title">影像资料补充</view>
+
+      <view class="image-field" wx:for="{{imageFields}}" wx:key="key">
+        <view class="image-header" data-key="{{item.key}}" bindtap="toggleImageSection">
+          <text class="image-label">{{item.label}}</text>
+          <view class="image-right">
+            <text class="image-tag {{item.required ? 'required' : ''}}">{{item.required ? '必传' : '选传'}}</text>
+            <text class="arrow {{expandedImages[item.key] ? 'down' : ''}}">›</text>
+          </view>
+        </view>
+
+        <view class="image-content" wx:if="{{expandedImages[item.key]}}">
+          <view class="image-list">
+            <view class="image-item" wx:for="{{form.images[item.key]}}" wx:for-item="img" wx:for-index="idx" wx:key="idx">
+              <image src="{{img}}" mode="aspectFill" data-key="{{item.key}}" data-url="{{img}}" bindtap="previewImage" />
+              <view class="delete-btn" data-key="{{item.key}}" data-index="{{idx}}" catchtap="deleteImage">×</view>
+            </view>
+            <view class="add-image" data-key="{{item.key}}" bindtap="chooseImage" wx:if="{{form.images[item.key].length < 9}}">
+              <text class="add-icon">+</text>
+              <text class="add-text">添加图片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view style="height: 240rpx;"></view>
+
+    <!-- 底部提示和按钮 -->
+    <view class="submit-area">
+      <view class="footer-tip">为保障审批结果，请完善资料并上传清晰图片</view>
+      <view class="btn-row">
+        <button class="draft-btn" data-draft="true" bindtap="handleSubmit" disabled="{{submitting}}">存为草稿</button>
+        <button class="submit-btn" data-draft="false" bindtap="handleSubmit" disabled="{{submitting}}">
+          {{submitting ? '提交中...' : '提交'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

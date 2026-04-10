@@ -1,0 +1,202 @@
+<view class="page" wx:if="{{!loading && customer}}">
+  <!-- 客户名称和状态 -->
+  <view class="top-card">
+    <view class="top-row">
+      <view class="customer-name">{{customer.customerName}}</view>
+      <view class="edit-btn" wx:if="{{isAdmin}}" bindtap="editCustomer">编辑</view>
+    </view>
+    <view class="tags">
+      <view class="tag {{customer.isOverdue ? 'tag-danger' : (customer.status === 'pending' ? 'tag-warning' : (customer.status === 'stored' ? 'tag-success' : 'tag-info'))}}">
+        {{customer.isOverdue ? '逾期' : (customer.status === 'pending' ? '未入库' : (customer.status === 'stored' ? '已入库' : '已完成'))}}
+      </view>
+      <view class="tag tag-info" wx:if="{{customer.isMortgage}}">按揭</view>
+    </view>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="card">
+    <view class="card-title">基本信息</view>
+    <view class="row">
+      <text class="label">身份证</text>
+      <text class="value">{{customer.idCard}}</text>
+    </view>
+    <view class="row">
+      <text class="label">电话</text>
+      <text class="value link" data-phone="{{customer.customerPhone}}" bindtap="callPhone">{{customer.customerPhone || '-'}}</text>
+    </view>
+    <view class="row">
+      <text class="label">地址</text>
+      <text class="value">{{customer.customerAddress}}</text>
+    </view>
+    <view class="row">
+      <text class="label">车牌号</text>
+      <text class="value">{{customer.licensePlate || '-'}}</text>
+    </view>
+    <view class="row">
+      <text class="label">车架号</text>
+      <text class="value">{{customer.frameNumber}}</text>
+    </view>
+    <view class="row">
+      <text class="label">车品牌</text>
+      <text class="value">{{customer.carBrand}}</text>
+    </view>
+    <view class="row">
+      <text class="label">客户来源</text>
+      <text class="value">{{customer.customerSource}}</text>
+    </view>
+  </view>
+
+  <!-- 银行信息 -->
+  <view class="card">
+    <view class="card-title">银行信息</view>
+    <view class="row">
+      <text class="label">开户行</text>
+      <text class="value">{{customer.bankName}}</text>
+    </view>
+    <view class="row">
+      <text class="label">银行卡号</text>
+      <text class="value">{{customer.bankCardNumber}}</text>
+    </view>
+  </view>
+
+  <!-- 车辆信息 -->
+  <view class="card">
+    <view class="card-title">车辆信息</view>
+    <view class="row">
+      <text class="label">评估金额</text>
+      <text class="value highlight">{{customer.assessmentAmount}}万元</text>
+    </view>
+    <view class="row">
+      <text class="label">是否按揭</text>
+      <text class="value">{{customer.isMortgage ? '是' : '否'}}</text>
+    </view>
+    <view class="row">
+      <text class="label">收车金额</text>
+      <text class="value highlight">{{customer.collectionAmount}}元</text>
+    </view>
+    <view class="row">
+      <text class="label">收车方案</text>
+      <text class="value">{{customer.collectionPlan}}</text>
+    </view>
+    <view class="row">
+      <text class="label">每期还款</text>
+      <text class="value highlight">{{customer.monthlyRepayment || '-'}}元</text>
+    </view>
+    <view class="row">
+      <text class="label">是否收车</text>
+      <text class="value">{{customer.isCollected}}</text>
+    </view>
+    <view class="row">
+      <text class="label">收车人</text>
+      <text class="value">{{customer.collector}}</text>
+    </view>
+    <view class="row">
+      <text class="label">档案收取员</text>
+      <text class="value">{{customer.archiveReceiver}}</text>
+    </view>
+  </view>
+
+  <!-- 销售计划/还款计划 -->
+  <view class="card" wx:if="{{repaymentPlans.length > 0}}">
+    <view class="card-title">销售计划</view>
+    <view class="plan-table">
+      <view class="plan-header">
+        <text class="plan-col plan-col-sm">期数</text>
+        <text class="plan-col">销售日期</text>
+        <text class="plan-col">应还</text>
+        <text class="plan-col">已还</text>
+        <text class="plan-col">状态</text>
+      </view>
+      <view class="plan-row" wx:for="{{repaymentPlans}}" wx:key="_id" bindtap="onPlanTap" data-plan="{{item}}">
+        <text class="plan-col plan-col-sm">{{item.period}}</text>
+        <text class="plan-col">{{item.dueDateFormatted}}</text>
+        <text class="plan-col plan-amount">¥{{item.expectedAmount}}</text>
+        <text class="plan-col plan-amount">{{item.paidAmount > 0 ? '¥' + item.paidAmount : '-'}}</text>
+        <view class="plan-col">
+          <text class="plan-tag {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 确认还款 - 底部面板 -->
+  <view class="pay-mask" wx:if="{{showPayDialog}}" bindtap="closePayDialog"></view>
+  <view class="pay-sheet {{showPayDialog ? 'pay-sheet-show' : ''}}">
+    <view class="pay-sheet-header">
+      <text bindtap="closePayDialog">取消</text>
+      <text class="pay-sheet-title">确认还款 - 第{{currentPlan.period}}期</text>
+      <text class="pay-sheet-confirm" bindtap="submitPayment">{{payLoading ? '提交中...' : '确认'}}</text>
+    </view>
+    <view class="pay-info">应还: ¥{{currentPlan.expectedAmount}}　已还: ¥{{currentPlan.paidAmount || 0}}</view>
+    <view class="pay-field">
+      <text>本次还款金额</text>
+      <input type="digit" placeholder="请输入金额" value="{{payAmount}}" bindinput="onPayAmountInput" />
+    </view>
+    <view class="pay-field">
+      <text>利息</text>
+      <input type="digit" placeholder="选填" value="{{payInterest}}" bindinput="onPayInterestInput" />
+    </view>
+    <view class="pay-field">
+      <text>备注</text>
+      <input placeholder="选填" value="{{payRemark}}" bindinput="onPayRemarkInput" />
+    </view>
+  </view>
+
+  <!-- 完结按钮 -->
+  <view class="card" wx:if="{{customer.status !== 'completed'}}">
+    <button class="complete-btn" type="warn" size="mini" bindtap="completeCustomer">标记完结</button>
+  </view>
+  <view class="card" wx:else>
+    <view style="text-align:center; color:#67c23a; font-weight:bold; padding:10rpx;">已完结</view>
+    <view wx:if="{{customer.completedAtFormatted}}" style="text-align:center; color:#999; font-size:24rpx; padding-bottom:10rpx;">
+      结清时间: {{customer.completedAtFormatted}}
+    </view>
+  </view>
+
+  <!-- 逾期信息 -->
+  <view class="card" wx:if="{{customer.isOverdue}}">
+    <view class="card-title">逾期信息</view>
+    <view class="row">
+      <text class="label">逾期天数</text>
+      <text class="value" style="color: #f56c6c; font-weight: bold;">{{customer.overdueDays || 0}} 天</text>
+    </view>
+    <view class="row">
+      <text class="label">逾期原因</text>
+      <text class="value">{{customer.overdueReason || '-'}}</text>
+    </view>
+  </view>
+
+  <!-- 影像资料 -->
+  <view class="card">
+    <view class="card-title">影像资料</view>
+    <scroll-view class="image-tabs" scroll-x>
+      <view
+        class="image-tab {{activeImageTab === item.key ? 'active' : ''}}"
+        wx:for="{{imageTabs}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onImageTabChange"
+      >
+        {{item.label}}
+      </view>
+    </scroll-view>
+    <view class="images">
+      <block wx:if="{{customer.images && customer.images[activeImageTab] && customer.images[activeImageTab].length > 0}}">
+        <image
+          wx:for="{{customer.images[activeImageTab]}}"
+          wx:key="*this"
+          src="{{item}}"
+          mode="aspectFill"
+          class="img"
+          data-urls="{{customer.images[activeImageTab]}}"
+          data-current="{{item}}"
+          bindtap="previewImage"
+        />
+      </block>
+      <view class="no-image" wx:else>暂无图片</view>
+    </view>
+  </view>
+</view>
+
+<view class="loading-page" wx:if="{{loading}}">加载中...</view>
+<view class="loading-page" wx:if="{{!loading && !customer}}">加载失败</view>

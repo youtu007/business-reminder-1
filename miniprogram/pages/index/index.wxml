@@ -1,0 +1,135 @@
+<view class="page">
+  <!-- 操作栏 -->
+  <view class="admin-bar">
+    <view class="admin-btn" bindtap="addCustomer">+ 添加客户</view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索内容" value="{{keyword}}" bindinput="onSearchInput" bindconfirm="onSearch" />
+    <picker class="search-type" mode="selector" range="{{searchTypes}}" range-key="label" value="{{searchTypeIndex}}" bindchange="onSearchTypeChange">
+      <view class="picker-text">--{{searchTypes[searchTypeIndex].label}}--</view>
+    </picker>
+  </view>
+
+  <!-- 日期选择 -->
+  <view class="filter-row">
+    <picker mode="date" value="{{filterDate}}" bindchange="onDateChange">
+      <view class="date-picker">{{filterDate || '点击选择日期'}}</view>
+    </picker>
+    <view class="clear-date" wx:if="{{filterDate}}" bindtap="clearDate">清除</view>
+  </view>
+
+
+  <!-- 状态Tab -->
+  <view class="tabs">
+    <view class="tab-wrapper">
+      <view class="tab {{activeTab === '' ? 'active' : ''}}" data-key="" bindtap="onTabChange">
+        全部
+      </view>
+    </view>
+    <view class="tab-wrapper">
+      <view class="tab {{activeTab === 'pending' ? 'active' : ''}}" data-key="pending" bindtap="onTabChange">
+        未入库
+      </view>
+      <view class="badge" wx:if="{{stats.pending > 0}}">{{stats.pending}}</view>
+    </view>
+    <view class="tab-wrapper">
+      <view class="tab {{activeTab === 'stored' ? 'active' : ''}}" data-key="stored" bindtap="onTabChange">
+        已入库
+      </view>
+      <view class="badge green" wx:if="{{stats.stored > 0}}">{{stats.stored}}</view>
+    </view>
+    <view class="tab-wrapper">
+      <view class="tab {{activeTab === 'overdue' ? 'active' : ''}}" data-key="overdue" bindtap="onTabChange">
+        逾期
+      </view>
+      <view class="badge red" wx:if="{{stats.overdue > 0}}">{{stats.overdue}}</view>
+    </view>
+  </view>
+
+  <!-- 子Tab -->
+  <view class="sub-tabs">
+    <view class="sub-tab active">所有</view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list">
+    <view class="card" wx:for="{{customers}}" wx:key="_id" data-id="{{item._id}}" bindtap="viewDetail">
+      <!-- 申请编号 -->
+      <view class="card-header">
+        <text class="order-no">申请编号：{{item.orderNo || item._id}}</text>
+        <text class="draft-tag" wx:if="{{item.isDraft}}">草稿</text>
+      </view>
+
+      <!-- 基本信息 -->
+      <view class="card-row">
+        <view class="card-col">
+          <text class="col-label">客户姓名</text>
+          <text class="col-value">{{item.customerName}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">品牌型号</text>
+          <text class="col-value">{{item.carBrand}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">收车金额</text>
+          <text class="col-value price">{{item.collectionAmount}}</text>
+        </view>
+      </view>
+
+      <!-- 状态信息 -->
+      <view class="card-row">
+        <view class="card-col">
+          <text class="col-label">订单状态</text>
+          <text class="col-value {{item.isOverdue ? 'red' : (item.status === 'completed' ? 'green' : '')}}">{{item.isOverdue ? '逾期' : (item.status === 'completed' ? '已完成' : '履约中')}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">车辆状态</text>
+          <text class="col-value">{{item.isCollected}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">账务状态</text>
+          <text class="col-value {{item.status === 'completed' ? 'green' : ''}}">{{item.status === 'completed' ? '已结清' : '正常'}}</text>
+        </view>
+      </view>
+
+      <!-- 渠道和金额 -->
+      <view class="card-row">
+        <view class="card-col">
+          <text class="col-label">渠道名称</text>
+          <text class="col-value">{{item.channelName || '-'}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">每期应还金额</text>
+          <text class="col-value price">{{item.monthlyRepayment || '-'}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">业务员</text>
+          <text class="col-value">{{item.salesmanId.name || '-'}}</text>
+        </view>
+      </view>
+
+      <!-- 申请时间 -->
+      <view class="card-time">
+        <text>申请时间：{{item.applicationTime}}</text>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="card-actions">
+        <!-- 草稿不显示放款凭证和入库/出库按钮 -->
+        <block wx:if="{{!item.isDraft}}">
+          <view class="btn btn-primary" catchtap="uploadVoucher" data-id="{{item._id}}">放款凭证</view>
+          <view class="btn btn-warning" wx:if="{{item.isCollected === '未入库'}}" catchtap="markStorage" data-id="{{item._id}}">入库</view>
+          <view class="btn btn-warning" wx:else catchtap="markDelivery" data-id="{{item._id}}">出库</view>
+        </block>
+        <view class="btn btn-default" catchtap="viewDetail" data-id="{{item._id}}" data-isdraft="{{item.isDraft}}">{{item.isDraft ? '编辑' : '详情'}}</view>
+      </view>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+    <view class="loading" wx:if="{{!hasMore && customers.length > 0}}">没有更多了</view>
+    <view class="empty" wx:if="{{!loading && customers.length === 0}}">暂无数据</view>
+  </view>
+</view>

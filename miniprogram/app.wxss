@@ -1,0 +1,95 @@
+/* 全局样式 */
+page {
+  background-color: #f5f5f5;
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.5;
+}
+
+.container {
+  padding: 20rpx;
+}
+
+/* 卡片 */
+.card {
+  background: #fff;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  padding-bottom: 16rpx;
+  margin-bottom: 16rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+/* 行 */
+.row {
+  display: flex;
+  padding: 12rpx 0;
+}
+
+.label {
+  width: 160rpx;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.value {
+  flex: 1;
+  color: #333;
+}
+
+/* 标签 */
+.tag {
+  display: inline-block;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 24rpx;
+}
+
+.tag-warning {
+  background: #fff7e6;
+  color: #d48806;
+}
+
+.tag-success {
+  background: #f6ffed;
+  color: #389e0d;
+}
+
+.tag-danger {
+  background: #fff1f0;
+  color: #cf1322;
+}
+
+.tag-info {
+  background: #f5f5f5;
+  color: #666;
+}
+
+/* 按钮 */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+}
+
+.btn-primary {
+  background: #1890ff;
+  color: #fff;
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+}

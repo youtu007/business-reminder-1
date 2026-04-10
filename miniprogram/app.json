@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/customer-form/customer-form",
+    "pages/salesmen/salesmen",
+    "pages/voucher/voucher"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890ff",
+    "navigationBarTitleText": "业务提醒",
+    "navigationBarTextStyle": "white"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,55 @@
+<view class="page">
+  <!-- 添加按钮 -->
+  <view class="header">
+    <view class="add-btn" bindtap="showAddForm">+ 添加业务员</view>
+  </view>
+
+  <!-- 列表 -->
+  <view class="list">
+    <view class="loading" wx:if="{{loading}}">加载中...</view>
+
+    <view class="card" wx:for="{{salesmen}}" wx:key="_id">
+      <view class="card-main">
+        <view class="info">
+          <text class="name">{{item.name}}</text>
+          <text class="phone">{{item.phone}}</text>
+        </view>
+        <view class="status {{item.status === 'active' ? 'active' : 'inactive'}}">
+          {{item.status === 'active' ? '启用' : '禁用'}}
+        </view>
+      </view>
+      <view class="card-actions">
+        <view class="btn" bindtap="showEditForm" data-id="{{item._id}}" data-name="{{item.name}}" data-phone="{{item.phone}}">编辑</view>
+        <view class="btn {{item.status === 'active' ? 'warning' : 'success'}}" bindtap="toggleStatus" data-id="{{item._id}}" data-status="{{item.status}}" data-name="{{item.name}}">
+          {{item.status === 'active' ? '禁用' : '启用'}}
+        </view>
+        <view class="btn danger" bindtap="deleteSalesman" data-id="{{item._id}}" data-name="{{item.name}}">删除</view>
+      </view>
+    </view>
+
+    <view class="empty" wx:if="{{!loading && salesmen.length === 0}}">暂无业务员</view>
+  </view>
+
+  <!-- 表单弹窗 -->
+  <view class="modal" wx:if="{{showForm}}">
+    <view class="modal-mask" bindtap="hideForm"></view>
+    <view class="modal-content">
+      <view class="modal-title">{{editingId ? '编辑业务员' : '添加业务员'}}</view>
+
+      <view class="form-field">
+        <text class="label">姓名</text>
+        <input class="input" placeholder="请输入姓名" value="{{form.name}}" data-field="name" bindinput="onInput" />
+      </view>
+
+      <view class="form-field">
+        <text class="label">手机号</text>
+        <input class="input" type="number" placeholder="请输入手机号" value="{{form.phone}}" data-field="phone" bindinput="onInput" />
+      </view>
+
+      <view class="modal-actions">
+        <view class="modal-btn cancel" bindtap="hideForm">取消</view>
+        <view class="modal-btn confirm" bindtap="handleSubmit">{{submitting ? '保存中...' : '保存'}}</view>
+      </view>
+    </view>
+  </view>
+</view>
