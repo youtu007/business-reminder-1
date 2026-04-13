@@ -122,7 +122,7 @@
         </view>
         <view class="card-col">
           <text class="col-label">剩余金额</text>
-          <text class="col-value price">{{item.repaymentStats.totalExpected - item.repaymentStats.totalPaid}}</text>
+          <text class="col-value price">{{item.repaymentStats.remaining}}</text>
         </view>
       </view>
 

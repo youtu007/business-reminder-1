@@ -92,7 +92,12 @@ router.get('/', authenticate, async (req, res) => {
       }}
     ]);
     const statsMap = {};
-    repaymentStats.forEach(s => { statsMap[s._id.toString()] = s; });
+    repaymentStats.forEach(s => {
+      s.totalExpected = Math.round(s.totalExpected * 100) / 100;
+      s.totalPaid = Math.round(s.totalPaid * 100) / 100;
+      s.remaining = Math.round((s.totalExpected - s.totalPaid) * 100) / 100;
+      statsMap[s._id.toString()] = s;
+    });
 
     const customersWithStats = customers.map(c => {
       const obj = c.toObject();
