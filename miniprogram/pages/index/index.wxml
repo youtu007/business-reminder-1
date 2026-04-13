@@ -110,6 +110,22 @@
         </view>
       </view>
 
+      <!-- 还款进度 -->
+      <view class="card-row" wx:if="{{item.repaymentStats}}">
+        <view class="card-col">
+          <text class="col-label">还款进度</text>
+          <text class="col-value">{{item.repaymentStats.paidPeriods}}/{{item.repaymentStats.totalPeriods}}期</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">已还金额</text>
+          <text class="col-value price">{{item.repaymentStats.totalPaid}}</text>
+        </view>
+        <view class="card-col">
+          <text class="col-label">剩余金额</text>
+          <text class="col-value price">{{item.repaymentStats.totalExpected - item.repaymentStats.totalPaid}}</text>
+        </view>
+      </view>
+
       <!-- 申请时间 -->
       <view class="card-time">
         <text>申请时间：{{item.applicationTime}}</text>

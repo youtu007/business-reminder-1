@@ -79,8 +79,29 @@ router.get('/', authenticate, async (req, res) => {
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
 
+    // 批量查询所有返回客户的还款汇总
+    const customerIds = customers.map(c => c._id);
+    const repaymentStats = await RepaymentPlan.aggregate([
+      { $match: { customerId: { $in: customerIds } } },
+      { $group: {
+        _id: '$customerId',
+        totalPeriods: { $sum: 1 },
+        paidPeriods: { $sum: { $cond: [{ $eq: ['$status', 'paid'] }, 1, 0] } },
+        totalExpected: { $sum: '$expectedAmount' },
+        totalPaid: { $sum: { $ifNull: ['$paidAmount', 0] } }
+      }}
+    ]);
+    const statsMap = {};
+    repaymentStats.forEach(s => { statsMap[s._id.toString()] = s; });
+
+    const customersWithStats = customers.map(c => {
+      const obj = c.toObject();
+      obj.repaymentStats = statsMap[c._id.toString()] || null;
+      return obj;
+    });
+
     res.json({
-      data: customers,
+      data: customersWithStats,
       pagination: {
         total,
         page: parseInt(page),

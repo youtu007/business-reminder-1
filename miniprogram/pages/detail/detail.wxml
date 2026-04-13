@@ -107,13 +107,19 @@
         <text class="plan-col">已还</text>
         <text class="plan-col">状态</text>
       </view>
-      <view class="plan-row" wx:for="{{repaymentPlans}}" wx:key="_id" bindtap="onPlanTap" data-plan="{{item}}">
-        <text class="plan-col plan-col-sm">{{item.period}}</text>
-        <text class="plan-col">{{item.dueDateFormatted}}</text>
-        <text class="plan-col plan-amount">¥{{item.expectedAmount}}</text>
-        <text class="plan-col plan-amount">{{item.paidAmount > 0 ? '¥' + item.paidAmount : '-'}}</text>
-        <view class="plan-col">
-          <text class="plan-tag {{item.statusClass}}">{{item.statusText}}</text>
+      <view wx:for="{{repaymentPlans}}" wx:key="_id">
+        <view class="plan-row" bindtap="onPlanTap" data-plan="{{item}}">
+          <text class="plan-col plan-col-sm">{{item.period}}</text>
+          <text class="plan-col">{{item.dueDateFormatted}}</text>
+          <text class="plan-col plan-amount">¥{{item.expectedAmount}}</text>
+          <text class="plan-col plan-amount">{{item.paidAmount > 0 ? '¥' + item.paidAmount : '-'}}</text>
+          <view class="plan-col">
+            <text class="plan-tag {{item.statusClass}}">{{item.statusText}}</text>
+          </view>
+        </view>
+        <view class="plan-detail" wx:if="{{item.interest || item.remark}}">
+          <text wx:if="{{item.interest}}">利息: ¥{{item.interest}}</text>
+          <text wx:if="{{item.remark}}">备注: {{item.remark}}</text>
         </view>
       </view>
     </view>
