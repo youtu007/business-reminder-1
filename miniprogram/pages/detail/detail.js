@@ -44,10 +44,11 @@ Page({
         app.request({ url: `/customers/${id}/repayment-plans` })
       ])
 
-      // 格式化还款计划日期
+      // 格式化还款计划日期，计算纯本金（已还总额 - 利息）
       const plans = (plansRes.data || []).map(p => ({
         ...p,
         dueDateFormatted: p.dueDate ? p.dueDate.substring(0, 10) : '-',
+        principalPaid: Math.round(((p.paidAmount || 0) - (p.interest || 0)) * 100) / 100,
         statusText: this.getPlanStatusText(p.status),
         statusClass: this.getPlanStatusClass(p.status)
       }))

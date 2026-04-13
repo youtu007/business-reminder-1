@@ -88,14 +88,17 @@ router.get('/', authenticate, async (req, res) => {
         totalPeriods: { $sum: 1 },
         paidPeriods: { $sum: { $cond: [{ $eq: ['$status', 'paid'] }, 1, 0] } },
         totalExpected: { $sum: '$expectedAmount' },
-        totalPaid: { $sum: { $ifNull: ['$paidAmount', 0] } }
+        totalPaid: { $sum: { $ifNull: ['$paidAmount', 0] } },
+        totalInterest: { $sum: { $ifNull: ['$interest', 0] } }
       }}
     ]);
     const statsMap = {};
     repaymentStats.forEach(s => {
       s.totalExpected = Math.round(s.totalExpected * 100) / 100;
-      s.totalPaid = Math.round(s.totalPaid * 100) / 100;
-      s.remaining = Math.round((s.totalExpected - s.totalPaid) * 100) / 100;
+      s.totalInterest = Math.round(s.totalInterest * 100) / 100;
+      // 已还本金 = 已还总额 - 利息
+      s.principalPaid = Math.round((s.totalPaid - s.totalInterest) * 100) / 100;
+      s.remaining = Math.round((s.totalExpected - s.principalPaid) * 100) / 100;
       statsMap[s._id.toString()] = s;
     });
 

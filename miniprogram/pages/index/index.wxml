@@ -117,12 +117,18 @@
           <text class="col-value">{{item.repaymentStats.paidPeriods}}/{{item.repaymentStats.totalPeriods}}期</text>
         </view>
         <view class="card-col">
-          <text class="col-label">已还金额</text>
-          <text class="col-value price">{{item.repaymentStats.totalPaid}}</text>
+          <text class="col-label">已还本金</text>
+          <text class="col-value price">{{item.repaymentStats.principalPaid}}</text>
         </view>
         <view class="card-col">
-          <text class="col-label">剩余金额</text>
+          <text class="col-label">剩余本金</text>
           <text class="col-value price">{{item.repaymentStats.remaining}}</text>
+        </view>
+      </view>
+      <view class="card-row" wx:if="{{item.repaymentStats.totalInterest > 0}}">
+        <view class="card-col">
+          <text class="col-label">累计利息</text>
+          <text class="col-value price">{{item.repaymentStats.totalInterest}}</text>
         </view>
       </view>
 
