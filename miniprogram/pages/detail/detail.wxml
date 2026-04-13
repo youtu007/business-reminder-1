@@ -112,7 +112,7 @@
           <text class="plan-col plan-col-sm">{{item.period}}</text>
           <text class="plan-col">{{item.dueDateFormatted}}</text>
           <text class="plan-col plan-amount">¥{{item.expectedAmount}}</text>
-          <text class="plan-col plan-amount">{{item.principalPaid > 0 ? '¥' + item.principalPaid : '-'}}</text>
+          <text class="plan-col plan-amount">{{item.paidAmount > 0 ? '¥' + item.paidAmount : '-'}}</text>
           <view class="plan-col">
             <text class="plan-tag {{item.statusClass}}">{{item.statusText}}</text>
           </view>

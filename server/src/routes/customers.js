@@ -95,10 +95,9 @@ router.get('/', authenticate, async (req, res) => {
     const statsMap = {};
     repaymentStats.forEach(s => {
       s.totalExpected = Math.round(s.totalExpected * 100) / 100;
+      s.totalPaid = Math.round(s.totalPaid * 100) / 100;
       s.totalInterest = Math.round(s.totalInterest * 100) / 100;
-      // 已还本金 = 已还总额 - 利息
-      s.principalPaid = Math.round((s.totalPaid - s.totalInterest) * 100) / 100;
-      s.remaining = Math.round((s.totalExpected - s.principalPaid) * 100) / 100;
+      s.remaining = Math.round((s.totalExpected - s.totalPaid) * 100) / 100;
       statsMap[s._id.toString()] = s;
     });
 

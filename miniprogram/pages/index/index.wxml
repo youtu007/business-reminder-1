@@ -118,7 +118,7 @@
         </view>
         <view class="card-col">
           <text class="col-label">已还本金</text>
-          <text class="col-value price">{{item.repaymentStats.principalPaid}}</text>
+          <text class="col-value price">{{item.repaymentStats.totalPaid}}</text>
         </view>
         <view class="card-col">
           <text class="col-label">剩余本金</text>
